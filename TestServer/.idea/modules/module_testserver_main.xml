@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_testserver_main" default="compile.module.testserver_main">
+  <dirname property="module.testserver_main.basedir" file="${ant.file.module_testserver_main}"/>
+  
+  <property name="module.jdk.home.testserver_main" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.testserver_main" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.testserver_main" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.testserver_main" value="-encoding UTF-8 -source 8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="testserver_main.output.dir" value="${module.testserver_main.basedir}/../../build/classes/main"/>
+  <property name="testserver_main.testoutput.dir" value="${module.testserver_main.basedir}/../../build/classes/main"/>
+  
+  <path id="testserver_main.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="testserver_main.module.production.classpath">
+    <path refid="${module.jdk.classpath.testserver_main}"/>
+  </path>
+  
+  <path id="testserver_main.runtime.production.module.classpath">
+    <pathelement location="${testserver_main.output.dir}"/>
+  </path>
+  
+  <path id="testserver_main.module.classpath">
+    <path refid="${module.jdk.classpath.testserver_main}"/>
+    <pathelement location="${testserver_main.output.dir}"/>
+  </path>
+  
+  <path id="testserver_main.runtime.module.classpath">
+    <pathelement location="${testserver_main.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.testserver_main">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.testserver_main">
+    <patternset refid="excluded.from.module.testserver_main"/>
+  </patternset>
+  
+  <path id="testserver_main.module.sourcepath">
+    <dirset dir="${module.testserver_main.basedir}/../../src/main">
+      <include name="java"/>
+      <include name="resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.testserver_main" depends="compile.module.testserver_main.production,compile.module.testserver_main.tests" description="Compile module TestServer_main"/>
+  
+  <target name="compile.module.testserver_main.production" depends="register.custom.compilers" description="Compile module TestServer_main; production classes">
+    <mkdir dir="${testserver_main.output.dir}"/>
+    <javac2 destdir="${testserver_main.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.testserver_main}/javac">
+      <compilerarg line="${compiler.args.testserver_main}"/>
+      <bootclasspath refid="testserver_main.module.bootclasspath"/>
+      <classpath refid="testserver_main.module.production.classpath"/>
+      <src refid="testserver_main.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.testserver_main"/>
+    </javac2>
+    
+    <copy todir="${testserver_main.output.dir}">
+      <fileset dir="${module.testserver_main.basedir}/../../src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.testserver_main.basedir}/../../src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.testserver_main.tests" depends="register.custom.compilers,compile.module.testserver_main.production" description="compile module TestServer_main; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.testserver_main" description="cleanup module">
+    <delete dir="${testserver_main.output.dir}"/>
+    <delete dir="${testserver_main.testoutput.dir}"/>
+  </target>
+</project>

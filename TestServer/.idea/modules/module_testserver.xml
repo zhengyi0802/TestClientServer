@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_testserver" default="compile.module.testserver">
+  <dirname property="module.testserver.basedir" file="${ant.file.module_testserver}"/>
+  
+  <property name="module.jdk.home.testserver" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.testserver" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.testserver" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.testserver" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="testserver.output.dir" value="${module.testserver.basedir}/../../out/production/TestServer"/>
+  <property name="testserver.testoutput.dir" value="${module.testserver.basedir}/../../out/test/TestServer"/>
+  
+  <path id="testserver.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="testserver.module.production.classpath">
+    <path refid="${module.jdk.classpath.testserver}"/>
+  </path>
+  
+  <path id="testserver.runtime.production.module.classpath">
+    <pathelement location="${testserver.output.dir}"/>
+  </path>
+  
+  <path id="testserver.module.classpath">
+    <path refid="${module.jdk.classpath.testserver}"/>
+    <pathelement location="${testserver.output.dir}"/>
+  </path>
+  
+  <path id="testserver.runtime.module.classpath">
+    <pathelement location="${testserver.testoutput.dir}"/>
+    <pathelement location="${testserver.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.testserver">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.testserver">
+    <patternset refid="excluded.from.module.testserver"/>
+  </patternset>
+  
+  
+  <target name="compile.module.testserver" depends="compile.module.testserver.production,compile.module.testserver.tests" description="Compile module TestServer"/>
+  
+  <target name="compile.module.testserver.production" depends="register.custom.compilers" description="Compile module TestServer; production classes"/>
+  
+  <target name="compile.module.testserver.tests" depends="register.custom.compilers,compile.module.testserver.production" description="compile module TestServer; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.testserver" description="cleanup module">
+    <delete dir="${testserver.output.dir}"/>
+    <delete dir="${testserver.testoutput.dir}"/>
+  </target>
+</project>
