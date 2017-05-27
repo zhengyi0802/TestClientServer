@@ -3,18 +3,18 @@ package com.example.chevylin0802.TestServer;
 import java.net.*;
 
 /**
- * Created by chevy on 2017/5/22.
+ * ClientClass 物件, 當每一個連線開啟的時候, 用來記錄連線的帳號, 客戶端的類型, 加入的群組, 以及關連於客戶端的socket與thread物件
  */
 public class ClientClass {
     public enum USERTYPE {
         NONE, USER, GROUP
     };
-    private Socket socket;
-    private String username;
-    private USERTYPE type;
-    private String groupof;
-    private int usernumber;
-    private BCastHandler thread;
+    private Socket socket; 			// 連線的socket物件
+    private String username; 		// 客戶端輸入的帳號, 以及群組客戶端的群祖帳號
+    private USERTYPE type; 			// 類型, 使用者或群組使用者
+    private String groupof;			// 所加入的群組帳號名稱
+    private int usernumber;			// 客戶端掛號的號碼 (暫時沒有使用到)
+    private BCastHandler thread; 	// 執行緒物件
 
     public ClientClass(Socket socket, BCastHandler thread) {
         this.socket = socket;
