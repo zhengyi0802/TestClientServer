@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.os.StrictMode;
 import android.os.Handler;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,6 +24,7 @@ import java.net.Socket;
 
 public class PhoneClientActivity extends AppCompatActivity {
 
+    private static final String TAG = "PhoneClientActivity";
     private EditText textIPAddr, textPort, textUsername, textGroup;
     private Button buttonStart, buttonStop;
     private TextView textMessages;
@@ -38,6 +40,7 @@ public class PhoneClientActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private boolean thread_flag = false;
 
+    // 手機客戶端連線程式
     public PhoneClientActivity() {
         strPort = "2060";
         numPort = 2060;
@@ -101,13 +104,16 @@ public class PhoneClientActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // 更新訊息函式, 由於Android採取UIThread的方式, 所以要靠Runnable的物件來儲理
     private final Runnable refresh = new Runnable() {
         public void run() {
             textMessages.setText(strMessages);
         }
     };
 
+    // 與伺服器連線的殖行緒, 當按下啟動按鈕時, 必需要採取開啟執行緒的方式來進行連線, 否則整個程式會被卡死
     private final Thread connectStart = new Thread() {
+
         public void run() {
             try {
                 strMessages = "Connect to Server : " + strIPAddr + ":" + strPort;
@@ -117,42 +123,56 @@ public class PhoneClientActivity extends AppCompatActivity {
                 reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
+                // 當thread_flag為假的時候, 才跳出迴圈
                 while (socket.isConnected() && thread_flag) {
+                    // 發送登入訊息
                     String strRegister = "REGISTER username=" + strUsername + " type=user\r\n";
-                    System.out.println("Write Message : " + strRegister);
+                    Log.d(TAG, "Write Message : " + strRegister);
                     writer.write(strRegister);
                     writer.flush();
 
-                    strMessages = reader.readLine();
-                    handler.post(refresh);
+                    while(reader.ready()) {
+                        strMessages = reader.readLine();
+                        if (strMessages.trim().length() > 0) {
+                            handler.post(refresh);
+                        }
+                    }
 
+                    // 發送加入群組訊息
                     String strJoin = "JOIN group=" + strGroup + "\r\n";
-                    System.out.println("Write Message : " + strJoin);
+                    Log.d(TAG, "Write Message : " + strJoin);
                     writer.write(strJoin);
                     writer.flush();
 
-                    strMessages = reader.readLine();
-                    handler.post(refresh);
+                    while(reader.ready()) {
+                        strMessages = reader.readLine();
+                        if (strMessages.trim().length() > 0) {
+                            handler.post(refresh);
+                        }
+                    }
 
+                    // 當thread_flag為假的時候, 才跳出迴圈
                     while (socket.isConnected() && thread_flag) {
                         if (reader.ready()) {
                             String mesg1 = reader.readLine().trim();
+                            if(mesg1.length() > 0) {
+                                strMessages = mesg1 + "\r\n";
+                                handler.post(refresh);
+                            }
 
-                            System.out.println("recv data : " + mesg1);
+                            Log.d(TAG, "recv data : " + mesg1);
                             if (mesg1.contains("MESSAGE")) {
                                 String strReply = "HIBP/1.0 200 OK\r\n";
                                 writer.write(strReply);
                                 writer.flush();
                             }
-                            if(mesg1.length() > 0) {
-                                strMessages = mesg1 + "\r\n";
-                                handler.post(refresh);
-                            }
                         }
+                        // 延遲讀取, 讓系統可以運作順利
                         Thread.sleep(100);
                     }
                 }
 
+                // 當thread_flag為假的時候, 結束連線
                 reader.close();
                 writer.close();
                 socket.close();
@@ -162,13 +182,15 @@ public class PhoneClientActivity extends AppCompatActivity {
                         "連結中斷", Toast.LENGTH_SHORT).show();
             }
 
+            // 清空連線物件
             reader = null;
             writer = null;
             socket = null;
-
         }
+
     };
 
+    // 當停止按紐按下時, 要停止網路連線
     public void connectStop() {
         thread_flag = false;
     }
@@ -177,7 +199,9 @@ public class PhoneClientActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
+
             boolean error = false;
+
             while(true) {
                 strIPAddr = textIPAddr.getText().toString();
                 if (strIPAddr == null || strIPAddr.length() == 0) {
