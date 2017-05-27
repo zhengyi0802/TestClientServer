@@ -42,8 +42,8 @@ public class PhoneClientActivity extends AppCompatActivity {
 
     // 手機客戶端連線程式
     public PhoneClientActivity() {
-        strPort = "2060";
-        numPort = 2060;
+        strPort = "5555";
+        numPort = 5555;
         strIPAddr = "127.0.0.1";
         strUsername = "H123223323";
         strGroup = "YDH01002";

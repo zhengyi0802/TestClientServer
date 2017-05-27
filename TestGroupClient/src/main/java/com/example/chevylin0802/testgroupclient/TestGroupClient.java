@@ -7,7 +7,7 @@ import java.net.*;
 public class TestGroupClient {
 	
 	private static String serverIP, serverPortStr, groupId;
-	private static int serverPort = 2060;
+	private static int serverPort = 5555;
 	private static Socket socket;
 	private static BufferedReader reader;
 	private static PrintWriter writer;
