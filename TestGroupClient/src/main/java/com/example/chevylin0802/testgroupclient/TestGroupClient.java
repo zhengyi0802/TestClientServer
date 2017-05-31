@@ -67,7 +67,7 @@ public class TestGroupClient {
 				int counts = 0;
 				while(socket.isConnected()) {					
 					// 發送門診叫號訊息
-					outmessage = "MESSAGE number=" + counts + "\r\n";
+					outmessage = "MESSAGE 當前門診號碼為" + counts + "號\r\n";
 					System.out.println(outmessage.trim());
 					writer.print(outmessage);
 					writer.flush();
