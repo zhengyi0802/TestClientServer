@@ -82,11 +82,48 @@ public class TestGroupClient {
 							System.out.println(str1);
 						}
 					}
-					// 延遲5秒鐘的時間再進行下一個號碼的叫號
-					Thread.sleep(5000);
-					counts++;
-				}				
-			}
+/*					
+					if (false) {
+						// 延遲5秒鐘的時間再進行下一個號碼的叫號
+						Thread.sleep(5000);
+						counts++;
+					}
+*/					
+					int dig = 0;
+					int num = 0;
+					boolean nflag = true;
+					while(nflag) {
+						char ch = (char) System.in.read();
+						switch(ch) {
+							case '+' :
+								counts++;
+								nflag = false;
+								ch = (char) System.in.read();
+								break;
+							case '-' :
+								if (counts > 1) counts--;
+								nflag = false;
+								ch = (char) System.in.read();
+								break;
+							default :
+								if ( ch >= '0' && ch <= '9') {
+									dig = ch-'0';
+									num = num * 10 + dig;
+									nflag = true;
+								} else if (ch == '\n') {
+									if(num > 0) {
+										counts = num;
+									}
+									dig = 0;
+									num = 0;
+									nflag = false;
+								}
+								break;
+						} // switch(ch) loop
+						Thread.sleep(100);
+					} // while nflag loop
+				} // while socket.isConnected()
+			} // while(true)
 			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
