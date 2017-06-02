@@ -2,6 +2,7 @@ package com.example.chevylin0802.testgroupclient;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 // 醫院門診端所使用的客戶端程式
 public class TestGroupClient {
@@ -10,7 +11,7 @@ public class TestGroupClient {
 	private static int serverPort = 5555;
 	private static Socket socket;
 	private static BufferedReader reader;
-	private static PrintWriter writer;
+	private static BufferedWriter writer;
 	
 	// 使用方法 : java -jar TestGroupClient.jar serverip[:port] groupid 
 	public static void main(String[] args) {
@@ -43,14 +44,14 @@ public class TestGroupClient {
 		try {
 			
 			socket = new Socket(serverIP, serverPort);
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            writer = new PrintWriter(socket.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
 			
             // 無窮迴圈
 			while(true) {
 				// 發送登入訊息
 				String outmessage = "REGISTER username=" + groupId + " type=group\r\n";
-				writer.print(outmessage);
+				writer.write(outmessage);
 				writer.flush();
 				
 				// 伺服器端會發送回應訊息, 所以在此等待資料接收
@@ -69,7 +70,7 @@ public class TestGroupClient {
 					// 發送門診叫號訊息
 					outmessage = "MESSAGE 當前門診號碼為" + counts + "號\r\n";
 					System.out.println(outmessage.trim());
-					writer.print(outmessage);
+					writer.write(outmessage);
 					writer.flush();
 					
 					// 伺服器端會發送回應訊息, 所以在此等待資料接收
